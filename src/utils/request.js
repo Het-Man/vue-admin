@@ -8,14 +8,15 @@ const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi'
 
 const service = axios.create({
   baseURL: BASEURL,
-  timeout: 1000,
-  headers: {'X-Requested-With': 'XMLHttpRequest'},
+  timeout: 10000,
 })
 
-service.defaults.headers.post['Content-Type'] = 'Content-Type:application/x-www-form-urlencoded; charset=UTF-8'
 
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
+
+  console.log(config)
+
   // 在发送请求之前做些什么
   return config;
 }, function (error) {

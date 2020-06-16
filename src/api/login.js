@@ -10,3 +10,27 @@ export function GetSms(data){
     data
   })
 } 
+
+/* 
+  注册
+*/
+export function Register(data){
+  return service.request({
+    method:'post',
+    url:"/register/",
+    data
+  })
+}
+
+/* 
+  登陆
+*/
+
+export function Login(data){
+  console.log(data)
+  return service.request({
+    method:'post',
+    url:"/login/",
+    data
+  })
+}
