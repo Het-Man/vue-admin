@@ -1,15 +1,13 @@
 <template>
   <div>
-    控制台页面
+    信息分类
   </div>
 </template>
-
 <script>
 export default {
-  name:'Index'
+  name:'infoCategory'
 }
 </script>
-
-<style lang="scss">
+<style lang="">
   
 </style>

@@ -1,15 +1,13 @@
 <template>
   <div>
-    控制台页面
+    用户列表
   </div>
 </template>
-
 <script>
 export default {
-  name:'Index'
+  name:'iuserIndex'
 }
 </script>
-
-<style lang="scss">
+<style lang="">
   
 </style>

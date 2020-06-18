@@ -214,8 +214,7 @@ export default {
       })
       
       GetSms(data).then(res=>{
-        console.log(res)
-        
+        console.log(res.data.message)
         context.root.$message({
           message:res.data.message,
           type:'success'
@@ -280,15 +279,18 @@ export default {
         password:sha1(ruleForm.password),
         code:ruleForm.code
       }
-      console.log(data)
-      Login(data).then(res=>{
+      // console.log(data)
+      // 登陆请求在vuex action 中发出
+      context.root.$store.dispatch('app/login',data).then(res => {
         console.log(res)
+        
         if(res.data.resCode === 0) {
           context.root.$router.push({name:'Home'})
         }
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
+      
     })
     // 注册
     const register  = (() =>{

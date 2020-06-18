@@ -27,7 +27,7 @@ export function Register(data){
 */
 
 export function Login(data){
-  console.log(data)
+  // console.log(data)
   return service.request({
     method:'post',
     url:"/login/",

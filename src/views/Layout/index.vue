@@ -1,5 +1,5 @@
 <template>
-  <div id='home'>
+  <div id='home' :class='[isCollapse ? "close" : "open"]'>
     <HomeHeader />
     <HomeMain />
     <HomeNav />
@@ -10,6 +10,7 @@
 import HomeHeader from './Components/Header'
 import HomeMain from './Components/Main'
 import HomeNav from './Components/Nav'
+import { computed } from '@vue/composition-api'
 export default {
   name:'Home',
   components:{
@@ -17,8 +18,11 @@ export default {
     HomeMain,
     HomeNav
   },
-  setup(props,context){
-
+  setup(props,{root}){
+    const isCollapse = computed(() => root.$store.state.app.isCollapse)
+    return {
+      isCollapse
+    }
   }
 }
 </script>
