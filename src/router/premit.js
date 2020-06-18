@@ -25,8 +25,10 @@ router.beforeEach((to,from,next) => {
     console.log('不存在')
     // 不存在就判断在下一个页面（to）中登陆页面是否存在 login 
     if(whiteRouter.indexOf(to.path) !== -1 ){
+      console.log(to)
       next()
     }else {
+      console.log(to)
       next('/login')
     }
   }
