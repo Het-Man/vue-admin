@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Message } from "element-ui";
+import { getToKen, getUserName } from '@/utils/tokenMethods'
 // import { reject } from 'core-js/fn/promise';
 //http://www.web-jshtml.cn/dependenciesapi
 //http://www.web-jshtml.cn/productapi
@@ -18,6 +19,8 @@ service.interceptors.request.use(function (config) {
   // console.log(config)
 
   // 在发送请求之前做些什么
+  config.headers['Tokey'] = getToKen()
+  config.headers['UserName'] = getUserName()
   return config;
 }, function (error) {
   // 对请求错误做些什么
