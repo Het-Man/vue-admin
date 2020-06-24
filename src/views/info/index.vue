@@ -8,7 +8,7 @@
             <div class='warp-content'>
               <el-select v-model="categoryVal" placeholder="请选择" style='width:100%' >
                 <el-option
-                  v-for="item in options.item"
+                  v-for="item in data.options.category"
                   :key="item.id"
                   :label="item.category_name"
                   :value="item.id">
@@ -23,10 +23,13 @@
           <div class='warp-content'>
             <el-date-picker style='width:100%'
               v-model="dataVal"
-              type="daterange"
+              type="datetimerange"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd HH:mm:ss"
               range-separator="至"
               start-placeholder="开始日期"
-              end-placeholder="结束日期">
+              end-placeholder="结束日期"
+              :default-time="['12:00:00', '08:00:00']">
             </el-date-picker>
           </div>
         </div>
@@ -37,9 +40,9 @@
           <div class='warp-content'>
             <el-select v-model="searchKey" style='width:100%' >
               <el-option
-                v-for="item in searchOption" 
+                v-for="item in data.searchOption.item" 
                 :value="item.value"
-                :label="item.category_name"
+                :label="item.label"
                 :key="item.value"
               >
               </el-option>
@@ -48,13 +51,13 @@
         </div>
       </el-col>
       <el-col :span='3'>
-        <el-input v-model='searchKey' placeholder='请输入内容'  style='width:100%' />
+        <el-input v-model='searchKeyWord' placeholder='请输入内容'  style='width:100%' />
       </el-col>
       <el-col :span='2'>
-        <el-button type='danger' style='width:100%' >搜索</el-button>
+        <el-button type='danger' style='width:100%' @click="search" >搜索</el-button>
       </el-col>
       <el-col :span='2' :push='3'>
-        <el-button type='danger' @click="dialogInfo = true" class="pull-right" style='width:100%' >
+        <el-button type='danger' @click="newAndEdit({title:'新增'})" class="pull-right" style='width:100%' >
           新增
         </el-button>
       </el-col>
@@ -62,18 +65,20 @@
     <div class='black-space-30'></div>
     <!-- 表格 -->
     <el-table
-      :data="tableData"
+      v-loading="loading"
+      :data="data.tableData.item"
       border
+      @selection-change="handleSelectionChange"
       style="width: 100%">
       <el-table-column type='selection' width='45'></el-table-column>
       <el-table-column prop="title" label="标题" align="center" width='830'></el-table-column>
-      <el-table-column prop="name" label="类别" align="center" width='130'></el-table-column>
-      <el-table-column prop="date" label="日期" align="center" width='237'></el-table-column>
-      <el-table-column prop="user" label="管理人" align="center" width='115'></el-table-column>
+      <el-table-column prop="categoryId" label="类别" :formatter="toCategory" align="center" width='130'></el-table-column>
+      <el-table-column prop="createDate" label="日期" :formatter="toDate" align="center"  width='237'></el-table-column>
+      <el-table-column prop="categoryName" label="管理人" align="center" width='115'></el-table-column>
       <el-table-column  label="操作" align="center" >
         <template slot-scope="scope" >     
-          <el-button type='danger' @click="delItem" size="small" >删除</el-button>
-          <el-button type="success" size="small"  >编辑</el-button>
+          <el-button type='danger' @click="delItem(scope.row.id)" size="small" >删除</el-button>
+          <el-button type="success" @click="newAndEdit({title:'编辑',id:scope.row.id})" size="small"  >编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,18 +94,20 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </el-col>
     </el-row>
     <!-- 新增弹出框 -->
-    <DialogInfo :flag.sync='dialogInfo' />
+    <DialogInfo :flag.sync='dialogInfo' :typeTitle='data.types' :category='data.options.category' @getListEmit='getList' />
   </div>
 </template>
 <script>
   import { reactive, ref, onMounted, watchEffect,watch} from '@vue/composition-api'
- import { global } from "../../utils/global_v3.0"
-import DialogInfo from './dialog/info'
+  import {GetList,removeInfo} from '@/api/news'
+  import { global } from "../../utils/global_v3.0"
+  import { timestampToTime } from '@/utils/validate'
+  import DialogInfo from './dialog/info'
 export default {
   name:'infoIndex',
   components: { DialogInfo },
@@ -108,70 +115,89 @@ export default {
     const { str, confirm } = global()
     // const { categoryItem, getInfoCategory } = common()
     // ==============值类型数据============
-    const searchKey = ref('ID')
+    const searchKey = ref('id')
+    const searchKeyWord = ref('')
     const categoryVal = ref('')
     const dataVal = ref('')
+    // 总条数
+    const total = ref(0)
     // 弹出框
     const dialogInfo = ref(false)
+    // loading
+    const loading = ref(false)
+    //删除id
+    const deleteId = ref('')
+    // 单条信息id 传给编辑弹窗
+    // const 
 
     // ===========================对象数据======================
-    const options = reactive(
-      {
+    const data = reactive({
+      options:{
+        category:[]
+      },
+      searchOption: {
+        item: [
+          {value:'id',label:"ID"},
+          {value:'title',label:"标题"}
+        ]
+      },
+      tableData : {
         item:[]
-      }
-    )
-    const searchOption = reactive([
-      {value:'id',label:"ID"},
-      {value:'title',label:"标题"}
-    ])
-    // 表格数据
-    const tableData = reactive(
-      [
-        {
-          date: '2016-05-02 19:31:31',
-          name: '国内信息',
-          title: '纽约市长白思豪宣布退出总统竞选 特朗普发推回应',
-          user:'管理员'
-        }, 
-        {
-          date: '2016-05-02 19:31:31',
-          name: '国内信息',
-          title: ' 习近平在中央政协工作会议暨庆祝中国人民政治协商会议成立70周年大会上发表重要讲',
-          user:'管理员'
-        }, 
-        {
-          date: '2016-05-02 19:31:31',
-          name: '国内信息',
-          title: '基里巴斯与局当台“断交”系蔡英文当局上台后断交第7国 1519 弄',
-          user:'管理员'
-        }, 
-        {
-          date: '2016-05-02 19:31:31',
-          name: '国内信息',
-          title: '不选了！纽约市长白思豪宣布退出2020美国大选',
-          user:'管理员'
-        }
-      ]
-    )   
+      },
+      page: {
+        pageNumber : 1,
+        pageSize : 10
+      },
+      // 弹出框类型
+      types: {}
+    }) 
     // ================函数 ===============================
     const handleSizeChange = (val) =>{
       console.log(val)
     }
+    // 新增或者编辑弹窗
+    const newAndEdit = (params) => {
+      dialogInfo.value = true
+      data.types ={...params}
+    }
+    // 格式化类型
+    const toCategory = (row, column, cellValue) => {
+      let id = cellValue
+      let categoryData = data.options.category.filter(item => item.id == id)[0];
+      return categoryData.category_name
+
+    }
+    // 格式化日期
+    const  toDate = (row, column, cellValue, index) => {
+      return timestampToTime(cellValue)
+    }
+    // 点击页码
     const handleCurrentChange = (val) =>{
-      console.log(val)
+      data.page.pageNumber = val
+      getList()
 
     }
     // 单个删除
-    const delItem = () => { 
+    const delItem = (id) => { 
+      //需要删除的id存起来
+      deleteId.value = [id]
       confirm({
           content:'确定要删除吗？删除后无法恢复！',
           tip:'警告',
           successFn: confirmDelete
       })
-      
     }
     // 批量删除
     const delAll = () => {
+      console.log(deleteId.value)
+      console.log(deleteId.value.length)
+      if(!deleteId.value || deleteId.value.length == 0){
+        root.$message({
+          message:'请选择需要删除的数据',
+          type:'error'
+        })
+        return false
+      }
       confirm({
         content:'确定删除全部吗',
         type:'success',
@@ -179,25 +205,86 @@ export default {
       })
     }
     const confirmDelete  = () => {
-      console.log('删除 删除删除')
+      console.log(1)
+      removeInfo({id:deleteId.value}).then(res => {
+        console.log(res)
+        getList()
+      }).catch(err=>{})
     }
-
-    const getCategory = () => {
-      root.$store.dispatch('app/getInfoCategory').then( res => {
-        options.item = res
+    // 获取信息列表
+    const getList = () =>{
+      let requestData = formatData()
+      loading.value = true
+      GetList(requestData).then(res => {
+        let resData = res.data.data.data
+        data.tableData.item = resData
+        // 总条数
+        total.value = res.data.data.total
+        loading.value = false
+      }).catch(err => {
+        loading.value = false
       })
     }
+    // 获取分类
+    const getCategory = () => {
+      root.$store.dispatch('app/getInfoCategory').then( res => {
+        data.options.category = res
+      })
+    }
+    // 搜索
+    const search = () => {
+      // console.log(categoryVal.value)
+      // console.log(dataVal.value)
+      console.log(searchKey.value)
+      let data = formatData()
+      getList()
+      console.log(data)
+    }
+    // 处理数据
+    const formatData = () => {
+      let requestData  = {
+        pageNumber: data.page.pageNumber,
+        pageSize: data.page.pageSize
+      }
+      // 分类
+      if(categoryVal.value) { requestData.categoryId = categoryVal.value}
+      // 日期
+      if(dataVal.value) {
+        // 开始日期
+        requestData.startTiem = dataVal.value[0],
+        // 结束日期
+        requestData.endTime = dataVal.value[1]
+
+      }
+      // 关键字
+      if(searchKeyWord.value){
+        requestData[searchKey.value] = searchKeyWord.value
+      }
+      return requestData
+    }
+    //选中
+    const handleSelectionChange = (val) => {
+      // console.log(val)
+      let id = val.map(item => item.id)
+      // console.log(id)
+      deleteId.value = id
+      // console.log(deleteId.value)
+    } 
+    /* 
+      vue 2.0 mounted
+    */
     onMounted(() => {
       getCategory()
+      getList()
     })
 
     return {
       // ref
-      categoryVal, searchKey, dataVal,dialogInfo,
+      categoryVal, searchKey, dataVal, dialogInfo, total, loading,searchKeyWord,
       // reactive
-      searchOption, options, tableData,
+      data,
       // 函数
-      handleSizeChange, handleCurrentChange,delItem,delAll
+      handleSizeChange, handleCurrentChange,delItem,delAll,toDate,toCategory, handleSelectionChange,search,newAndEdit,getList
     }
   }
 }

@@ -13,7 +13,10 @@ export function global(){
     })
     .then(() => {
       str.value = params.id || ""
-      params.successFn && params.successFn( params.id|| '')
+      if(params.successFn) {
+        params.successFn( params.id|| '')
+      }
+      // params.successFn && params.successFn( params.id|| '')
     })
     .catch(() => {
       params.catchFn && params.catchFn( params.id|| '')

@@ -17,8 +17,8 @@
                   round
                   @click="editCategory({data:item,type:'category_first_edit'})"
                 >编辑</el-button>
-                <el-button type="success" size="mini" round>添加子级</el-button>
-                <el-button size="mini" round @click="delCategory(item.id)">删除</el-button>
+                <el-button type="success" size="mini" round @click="handleAddChildren({data:item, type:'category_children_add'})" >添加子级</el-button>
+                <el-button size="mini" round @click="delCategory({id:item.id})">删除</el-button>
               </div>
             </h4>
             <!-- 子类 -->
@@ -26,8 +26,8 @@
               <li v-for="itemChildren in item.children" :key="itemChildren.id">
                 {{itemChildren.category_name}}
                 <div class="button-group">
-                  <el-button type="danger" size="mini" round>编辑</el-button>
-                  <el-button size="mini" round>删除</el-button>
+                  <el-button type="danger" size="mini" round @click="editCategory({data:itemChildren, type:'category_children_edit'})" >编辑</el-button>
+                  <el-button size="mini" round @click="delCategory({id:itemChildren.id,parentData:item,type:'delChildren'})">删除</el-button>
                 </div>
               </li>
             </ul>
@@ -58,7 +58,7 @@
 </template>
 <script>
 import { reactive, ref, onMounted, refs, watch } from "@vue/composition-api";
-import { AddInfo, RemoveCategory, EditCategorys } from "@/api/news";
+import { addOneCategory, RemoveCategory, EditCategorys, AddChildrenCategory } from "@/api/news";
 import { global } from "../../utils/global_v3.0";
 import { common } from "@/api/common";
 export default {
@@ -67,7 +67,7 @@ export default {
     // 删除确认弹窗
     const { confirm } = global();
     // 获取分类
-    const { getInfoCategory, categoryItem } = common()
+    const { getInfoCategory, categoryItem, getInfoCategoryAll } = common()
     /* 
       =============数值类型=========================================================
       vue2.0 data
@@ -86,6 +86,8 @@ export default {
     const categoryId = ref("");
     // submit提交类型
     const submitBtnType = ref("");
+    //  删除的类型
+    const deleteType = ref("")
     /* 
       =============引用类型数值=========================================================
     */
@@ -106,19 +108,14 @@ export default {
     */
     //提交按钮
     const onSubmit = () => {
-      // console.log(form.oneName)
-      console.log(submitBtnType.value)
-      if( submitBtnType.value == 'category_first_add') {
-        addFirstCategory()
-      }
-      if( submitBtnType.value == 'category_first_edit' ){
-        eaitFistCategory()
-      }
+      if( submitBtnType.value == 'category_first_add') {addFirstCategory()}
+      if( submitBtnType.value == 'category_first_edit' || submitBtnType.value == 'category_children_edit' ){eaitFistCategory()}
+      if( submitBtnType.value == 'category_children_add'){addChildrenCategory()}
     };
     // 添加一级分类按钮
     const addFirst = params => {
       console.log(params);
-      btnCategory(params.type);
+      btnCategory(params);
       form.oneName = "";
     };
     // 添加一级分类
@@ -132,7 +129,7 @@ export default {
       }
       btnLoading.value = true;
       // 添加分类
-      AddInfo({ categoryName: form.oneName })
+      addOneCategory({ categoryName: form.oneName })
         .then(res => {
           console.log(res);
           let data = res.data;
@@ -142,7 +139,7 @@ export default {
               type: "success"
             });
             // 添加完分类后再获取一遍分类列表
-            getInfoCategory();
+            getInfoCategoryAll();
             // 或者直接添加到分类中 但是如果多人提交分类 还是再请求一遍比较好
             // category.item.push(res.data.data)
           }
@@ -152,6 +149,40 @@ export default {
           btnDisable();
         });
     };
+    // 添加子级分类按钮
+    const handleAddChildren = (params) => {
+      // 显示一级文本类型
+      form.oneName =  params.data.category_name;
+      form.twoName = ''
+      // 存放数据
+      category.current = params.data
+      // 更新按钮类型
+      btnCategory(params)
+      
+    }
+    // 添加子级分类接口
+    const addChildrenCategory = () => {
+      let requestData = {
+        categoryName: form.twoName,
+        parentId: category.current.id
+      }
+      if(!form.twoName){
+        root.$message({
+            message: '子级分类名称不能为空！',
+            type: 'error'
+        })
+        return false
+      }
+      AddChildrenCategory(requestData).then(res => {
+        console.log(res)
+        root.$message({
+          message: res.data.message,
+          type:'success'
+        })
+        getInfoCategoryAll()
+        form.twoName = ''
+      }).catch(err => {})
+    }
     // 清除表单 按钮状态还原
     const btnDisable = () => {
       btnLoading.value = false;
@@ -159,8 +190,13 @@ export default {
       form.twoName = "";
     };
     // 删除分类
-    const delCategory = id => {
-      categoryId.value = id;
+    const delCategory = params => {
+      // 存放删除id
+      categoryId.value = params.id;
+      // 存放父级数据
+      category.current = params.parentData
+      // 存放删除的类型（子级 还是父级）
+      deleteType.value = params.type
       confirm({
         content: "确定要删除吗？删除后无法恢复！",
         tip: "警告",
@@ -170,32 +206,46 @@ export default {
           categoryId.value = "";
         }
       });
+     
     };
     const confirmDelete = () => {
       RemoveCategory({ categoryId: categoryId.value }).then(res => {
         console.log(res);
         // getCategory()
         // 找到当前被删除的索引
-        let index = category.item.findIndex(
-          item => item.id == categoryId.value
-        );
-        // 然后删除
-        category.item.splice(index, 1);
+        if(deleteType.value == 'delChildren'){
+          let index = category.current.children.findIndex(
+            item => item.id == categoryId.value
+          )
+          category.current.children.splice(index,1)
+        }else {
+          let index = category.item.findIndex(
+            item => item.id == categoryId.value
+          );
+          // 然后删除
+          category.item.splice(index, 1);
+
+        }
       });
     };
     // 编辑分类
     const editCategory = params => {
-      form.oneName = params.data.category_name;
+      // 更新按钮类型
+      btnCategory(params)
+      // 根据类型判断 是一级分类编辑 还是子级分类编辑
+      submitBtnType.value == 'category_first_edit' ? form.oneName = params.data.category_name : form.twoName = params.data.category_name
       //把当前数据存到对象中
       category.current = params.data
-      btnCategory(params.type)
+      
     };
     // 编辑分类接口
     const eaitFistCategory = () => {
       let requestData = {
         id: category.current.id,
-        categoryName: form.oneName
+        categoryName: submitBtnType.value == 'category_first_edit' ? form.oneName : form.twoName
       }
+      console.log(requestData)
+      // return false
       EditCategorys(requestData).then(res => {
         // 提示成功
         root.$message({
@@ -206,6 +256,7 @@ export default {
         category.current.category_name = res.data.data.data.categoryName
         // 情况input
         form.oneName = ''
+        form.twoName = ''
         // 情况存储的对象
         category.current = []
         submitBtnDisabled.value = true;
@@ -216,21 +267,29 @@ export default {
     const btnCategory = btnType => {
       // 按钮不禁用
       submitBtnDisabled.value = false;
-      // 一级input显示不禁用
+      // 一二级input显示不禁用
       oneInpDisabled.value = false;
+      twoInpDisabled.value = false;
       // 二级input不显示
       twoCategoryShow.value = false;
       // 一级input显示
       oneCategoryShow.value = true;
+      
       // 存放提交按钮类型
-      submitBtnType.value = btnType;
-      switch (btnType) {
+      submitBtnType.value = btnType.type;
+      switch (btnType.type) {
         case "category_first_add":
           break;
         case "category_first_edit":
           break;
-        case 3:
-          console.log(3);
+        case 'category_children_add':
+          oneInpDisabled.value = true;
+          twoCategoryShow.value = true;
+          
+          break;
+        case 'category_children_edit':
+          oneCategoryShow.value = false;
+          twoCategoryShow.value = true;
           break;
 
         default:
@@ -243,7 +302,7 @@ export default {
     */
     onMounted(() => {
       // 获取一级分类
-      getInfoCategory()
+      getInfoCategoryAll()
     });
 
     watch(() => categoryItem.item,(value)=>{
@@ -265,7 +324,8 @@ export default {
       onSubmit,
       addFirst,
       delCategory,
-      editCategory
+      editCategory,
+      handleAddChildren,
     };
   }
 };

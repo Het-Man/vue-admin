@@ -30,3 +30,36 @@ export function  VerificationCode(value){
   return !reg.test(value)
 }
 
+
+export function formatDateTime(inputTime) {
+  var date = new Date(inputTime);
+  var y = date.getFullYear();
+  var m = date.getMonth() + 1;
+  m = m < 10 ? ('0' + m) : m;
+  var d = date.getDate();
+  d = d < 10 ? ('0' + d) : d;
+  var h = date.getHours();
+  h = h < 10 ? ('0' + h) : h;
+  var minute = date.getMinutes();
+  var second = date.getSeconds();
+  minute = minute < 10 ? ('0' + minute) : minute;
+  second = second < 10 ? ('0' + second) : second;
+  return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+};
+
+// 时间戳转格式 xxxx-xx-xx xx:xx:xx
+export function timestampToTime(timestamp) {
+  let now = new Date(timestamp*1000);
+  let year = now.getFullYear();    
+  let month = now.getMonth()+1;    
+  let date = now.getDate();    
+  let hour = now.getHours(); 
+  hour =  hour < 10 ? '0'+hour:hour;
+  let minute = now.getMinutes();   
+  minute =  minute < 10 ? '0'+minute:minute;
+  let second = now.getSeconds(); 
+  second =  second < 10 ? '0'+second:second;   
+  return year+"-"+month+"-"+date+"   "+ hour + ":" + minute + ":" + second;
+}
+
+
