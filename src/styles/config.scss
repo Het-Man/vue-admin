@@ -14,3 +14,17 @@ $mainCcolor: #f56c6c;
   -ms-#{$type}: $value;
   #{$type}: $value;
 }
+
+
+@mixin labelDom( $align, $width, $line-height: "noraml" ){
+  label {
+    color:#344a5f;
+    float: left;
+    line-height: $line-height + px;
+    width: $width + px;
+    text-align: $align;
+  }
+  .warp-content{
+    margin-left: $width + px;
+  }
+}

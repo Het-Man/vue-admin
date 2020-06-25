@@ -1,6 +1,7 @@
 
 import { Login} from '@/api/login'
 import { setToKen,removeToKen,removeUserName, setUserName, getUserName } from '../../utils/tokenMethods'
+import { GetCategory } from '@/api/news'
 const state  = {
   isCollapse: JSON.parse(sessionStorage.getItem("isCollapse")) || false,
   toKen :'',
@@ -55,7 +56,17 @@ const actions = {
         commit("SET_USERNAME","")
         resolve()
       })
-    }
+    },
+    //获取分类
+    getInfoCategory(content, repuestData) {
+      return new Promise((resolve, reject) => {
+          GetCategory({}).then((response) => {
+              resolve(response.data.data.data)
+          }).catch(error => {
+              reject(error)
+          })
+      })
+  }
 }
 
 
