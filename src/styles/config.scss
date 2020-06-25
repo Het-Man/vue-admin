@@ -1,0 +1,30 @@
+// 菜单宽度
+$navMenu: 250px;
+$navMenuMin: 64px;
+$layoutHeader: 75px;
+
+// 主颜色
+$mainCcolor: #f56c6c;
+
+// 过渡
+@mixin webkit($type,$value) {
+  -webkit-#{$type}: $value;
+  -omz-#{$type}: $value;
+  -o-#{$type}: $value;
+  -ms-#{$type}: $value;
+  #{$type}: $value;
+}
+
+
+@mixin labelDom( $align, $width, $line-height: "noraml" ){
+  label {
+    color:#344a5f;
+    float: left;
+    line-height: $line-height + px;
+    width: $width + px;
+    text-align: $align;
+  }
+  .warp-content{
+    margin-left: $width + px;
+  }
+}
