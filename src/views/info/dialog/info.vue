@@ -155,6 +155,7 @@ export default {
             type:'success'
           })
           emit('getListEmit')
+          data.submitLoading = false
         }).catch(err => {})
 
     }
