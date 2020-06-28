@@ -6,10 +6,12 @@ const state  = {
   isCollapse: JSON.parse(sessionStorage.getItem("isCollapse")) || false,
   toKen :'',
   userName: getUserName() || '',
+  qiniuUrl: 'http://www-web-jshtml-cn-idva7mx.web-jshtml.cn/'
 }
 const getters = {
   isCollapse : state => state.isCollapse,
-  userName: state => state.userName
+  userName: state => state.userName,
+  qiniuUrl: state => state.qiniuUrl
 }
 const mutations = {
   SET_COLLAPSE(state,value){
