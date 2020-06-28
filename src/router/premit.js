@@ -10,7 +10,6 @@ const  whiteRouter = ['/login'];
 router.beforeEach((to,from,next) => {
   // 判断是否存在token
   if(getToKen()){
-    console.log('存在')
     // 如果在首页直接输入网站为login 就把token删了 退出登录
     if(to.path === '/login'){
       removeToKen()
@@ -22,7 +21,6 @@ router.beforeEach((to,from,next) => {
       next()
     }
   }else{
-    console.log('不存在')
     // 不存在就判断在下一个页面（to）中登陆页面是否存在 login 
     if(whiteRouter.indexOf(to.path) !== -1 ){
       console.log(to)

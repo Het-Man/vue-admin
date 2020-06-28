@@ -79,7 +79,7 @@
         <template slot-scope="scope" >     
           <el-button type='danger' @click="delItem(scope.row.id)" size="small" >删除</el-button>
           <el-button type="success" @click="newAndEdit({title:'编辑',id:scope.row.id})" size="small"  >编辑</el-button>
-          <el-button type="success" @click="newAndEdit({title:'编辑',id:scope.row.id})" size="small"  >编辑详情</el-button>
+          <el-button type="success" @click="detailed(scope.row)" size="small"  >编辑详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -271,6 +271,28 @@ export default {
       deleteId.value = id
       // console.log(deleteId.value)
     } 
+    // 编辑详情
+    const detailed = (params) => {
+      root.$store.commit('InfoDetailed/UPDATE_STATE_VALUE',{
+        id:{
+          value: params.id,
+          sessionKey: "infoId",
+          session:true
+        },
+        title:{
+          value: params.title,
+          sessionKey: "infoTitle",
+          session:true
+        }
+      })
+      root.$router.push({
+        name:'InfoDetailed',
+        params: {
+          id: params.id,
+          title: params.title
+        }
+      })
+    }
     /* 
       vue 2.0 mounted
     */
@@ -285,7 +307,7 @@ export default {
       // reactive
       data,
       // 函数
-      handleSizeChange, handleCurrentChange,delItem,delAll,toDate,toCategory, handleSelectionChange,search,newAndEdit,getList
+      handleSizeChange, handleCurrentChange,delItem,delAll,toDate,toCategory, handleSelectionChange,search,newAndEdit,getList,detailed
     }
   }
 }

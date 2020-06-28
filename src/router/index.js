@@ -8,6 +8,7 @@ const Console = () => import("@/views/Console");
 const infoIndex = () => import("@/views/info");
 const infoCategory = () => import("@/views/info/category");
 const userIndex = () => import("@/views/user");
+const InfoDetailed = () => import("@/views/info/InfoDetailed")
 Vue.use(VueRouter);
 
 const routes = [
@@ -79,6 +80,15 @@ const routes = [
           name:'信息分类'
         },
         component:infoCategory
+      },
+      {
+        path: '/InfoDetailed',
+        name: 'InfoDetailed',
+        hidden: true,
+        meta:{
+          name:'信息详情'
+        },
+        component:InfoDetailed
       }
     ]
   },
