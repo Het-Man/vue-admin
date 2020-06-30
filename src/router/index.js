@@ -10,7 +10,10 @@ const infoCategory = () => import("@/views/info/category");
 const userIndex = () => import("@/views/user");
 const InfoDetailed = () => import("@/views/info/InfoDetailed")
 Vue.use(VueRouter);
-
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 const routes = [
   {
     path:'/',

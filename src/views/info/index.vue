@@ -38,7 +38,7 @@
         <div class='label-wrap key-work'>
           <label for >关键字：</label>
           <div class='warp-content'>
-            <el-select v-model="searchKey" style='width:100%' >
+            <!-- <el-select v-model="searchKey" style='width:100%' >
               <el-option
                 v-for="item in data.searchOption.item" 
                 :value="item.value"
@@ -46,7 +46,8 @@
                 :key="item.value"
               >
               </el-option>
-            </el-select>
+            </el-select> -->
+            <SelectVue :config="data.configOption" />
           </div>
         </div>
       </el-col>
@@ -105,13 +106,19 @@
 </template>
 <script>
   import { reactive, ref, onMounted, watchEffect,watch} from '@vue/composition-api'
+  // 获取列表
   import {GetList,removeInfo} from '@/api/news'
+  // 全局定义是否确认删除弹出框
   import { global } from "../../utils/global_v3.0"
+  // 转换时间
   import { timestampToTime } from '@/utils/validate'
+  // 下拉框组件
+  import SelectVue from "@/components/Select"
+  // 弹出框组件
   import DialogInfo from './dialog/info'
 export default {
   name:'infoIndex',
-  components: { DialogInfo },
+  components: { DialogInfo, SelectVue },
   setup(props, {root}){
     const { str, confirm } = global()
     // const { categoryItem, getInfoCategory } = common()
@@ -133,6 +140,9 @@ export default {
 
     // ===========================对象数据======================
     const data = reactive({
+      configOption: {
+        init:['id','title']
+      },
       options:{
         category:[]
       },

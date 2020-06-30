@@ -122,7 +122,7 @@ export default {
         let requestData = {
           categoryId: data.form.category ,
           title: data.form.title,
-          imgUrl: "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=304341154,1082578760&fm=26&gp=0.jpg",
+          imgUrl: "",
           createDate: dateTime,
           content: data.form.content,
         }
@@ -166,7 +166,7 @@ export default {
         id: props.typeTitle.id,
         categoryId: data.form.category ,
         title: data.form.title,
-        imgUrl: "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=304341154,1082578760&fm=26&gp=0.jpg",
+        imgUrl: "",
         createDate: dateTime,
         content: data.form.content,
       }
