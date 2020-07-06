@@ -23,11 +23,11 @@
         </div>
       </el-col>
       <el-col :span="4">
-        <el-button type="danger">添加用户</el-button>
+        <el-button type="danger" @click='data.dialog_add = true'>添加用户</el-button>
       </el-col>
     </el-row>
     <div class="black-space-30"></div>
-    <TableVue :configTable="data.configTable" >
+     <TableVue :configTable="data.configTable" >
       <!-- 作用域插槽 v-slot:status(插槽名)slotData(子传父的命名) -->
       <template v-slot:status="slotData" >
         <el-switch  active-color="#13ce66" inactive-color="#ff4949" ></el-switch>
@@ -37,27 +37,32 @@
         <el-button type='success' size="small" @click="handlerEdit(slotData.data)" >编辑</el-button>
       </template>
     </TableVue>
+    <!-- 弹出框 -->
+    <DialogAdd :flag.sync="data.dialog_add" ></DialogAdd>
   </div>
 </template>
 <script>
 import { reactive, ref, onMounted, computed } from "@vue/composition-api";
 import SelectVue from "@/components/Select"
 import TableVue from "@/components/Table"
+import TableVue2 from "@/components/Table2.0"
+import DialogAdd from './dialog/add'
 export default {
   name:'iuserIndex',
-  components:{ SelectVue, TableVue },
+  components:{ SelectVue, TableVue,TableVue2,DialogAdd },
   setup( props, { root } ){
     const data = reactive({
       configOption: {
         init:['name','phone']
       },
+      dialog_add: false,
       configTable:{
         selection:false,
         recordCheckbox: true,
         tHead:[
           {
            label: "邮箱/用户名" ,
-           field: "username"
+           field: "title"
           },
           {
            label: "真实姓名",
@@ -87,7 +92,15 @@ export default {
            columnType: "slot",
             slotName: "operation"
           },
-        ]
+        ],
+        requestData: {
+          url: "getUserList",
+          method: "post",
+          data:{
+            pageNumber: 1,
+            pageSize: 10,
+          }
+        }
       }
     })
 
