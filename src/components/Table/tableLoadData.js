@@ -8,11 +8,12 @@ export function loadData () {
   })
 
   const tableLoadData = (params) => {
+    console.log(params)
     let requestJson =params
     const resData = {
       method: requestJson.method,
-      // url:requestUrl[requestJson.url],
-      url:"/news/getList/",
+      url:requestUrl[requestJson.url],
+      // url:"/news/getList/",
       data: requestJson.data
     }
 
@@ -20,30 +21,6 @@ export function loadData () {
         tableData.item = res.data.data.data
         tableData.total = res.data.data.total
         console.log(res)
-        // tableData.item = [
-        //   {
-        //     username: '409019683@qq.com',
-        //     truename: '张三',
-        //     phone: '13788888888',
-        //     region: '上海市普陀区金沙江路 1518 弄',
-        //     role: '系统管理员'
-        //   }, 
-        //   {
-        //     username: '2016-05-04',
-        //     truename: '王小虎',
-        //     region: '上海市普陀区金沙江路 1517 弄'
-        //   }, 
-        //   {
-        //     username: '2016-05-01',
-        //     truename: '张粘结',
-        //     region: '上海市普陀区金沙江路 1519 弄'
-        //   }, 
-        //   {
-        //     username: '2016-05-03',
-        //     truename: '王小虎',
-        //     region: '上海市普陀区金沙江路 1516 弄'
-        //   }
-        // ]
       }).catch(err => {
 
       })

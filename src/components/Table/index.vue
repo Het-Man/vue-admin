@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="data.tableData" border style="width: 100%">
+    <el-table :data="data.tableData" border style="width: 100%" @selection-change="thatSelectCheckbox">
       <!-- 多选框 -->
       <el-table-column v-if="data.tableConfig.selection" type="selection" width="55"></el-table-column>
       <template v-for="item in data.tableConfig.tHead">
@@ -18,16 +18,27 @@
 
       </template>
     </el-table>
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pageData.currentPage"
-      :page-sizes="pageData.pageSizes"
-      :page-size="pageData.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="pageData.total"
-      background>
-    </el-pagination>
+    <div class="table-footer">
+      <el-row>
+        <el-col :span="4">
+          <slot name="tableFooterLeft"></slot>
+        </el-col>
+        <el-col :span="20">
+          <el-pagination
+          class="pull-right"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageData.currentPage"
+          :page-sizes="pageData.pageSizes"
+          :page-size="pageData.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pageData.total"
+          background>
+        </el-pagination>
+        </el-col>
+      </el-row>
+    </div>
+    
   </div>
 </template>
 <script>
@@ -45,8 +56,12 @@ export default {
       type: Object,
       default: () => {}
     },
+    tableRow:{
+      type: Object,
+      default: () => {}
+    }
   },
-  setup(props, { root }){
+  setup(props, { root, emit }){
     // 表格数据逻辑业务
     const { tableLoadData, tableData } = loadData()
     // 页码逻辑
@@ -61,6 +76,7 @@ export default {
       },
       tableData: []
     })
+    
     // watch
     // 监听 封装的table返回值 如果有值就赋给tableData
     watch([
@@ -71,6 +87,7 @@ export default {
       // console.log(total)
       totalCount(total)
     })
+
     // 监听页码
     watch([
       () => pageData.pageSize,
@@ -111,22 +128,52 @@ export default {
       // 第三种
       data.tableConfig = {...configData}
     }
+    // 多选框改变触发
+    const thatSelectCheckbox = (val) => {
+      // 把选中的每一项数据中的id 拿出来
+      let rowData = {
+        idItem:val.map(item => item.id)
+      }
+      emit("update:tableRow",rowData)
+    }
 
+    // 返回给父组件的重新渲染数据方法
+    const refreshData = () => {
+      tableLoadData(data.tableConfig.requestData)
+    }
+
+    // 带参数的渲染数据方法
+    const paramsLoadData = (params) => {
+      console.log(params)
+      // 把搜索条件合并 并且页码切回第一页
+      let loadData = Object.assign({},params,{
+        pageNumber: 1,
+        pageSize: 10
+      })
+      console.log(loadData)
+      // 把外面传进来的data给替换掉
+      data.tableConfig.requestData.data = loadData
+      tableLoadData(data.tableConfig.requestData)
+    }
 
     onBeforeMount(()=> {
       initTableConfig()
       tableLoadData(data.tableConfig.requestData)
 
     })
+
     return {
       //reactive
       data,pageData,
       //function 
-      handleSizeChange,handleCurrentChange
+      handleSizeChange,handleCurrentChange,thatSelectCheckbox,refreshData,paramsLoadData
     }
   }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.table-footer {
+  padding: 15px 0;
+}
 </style>
