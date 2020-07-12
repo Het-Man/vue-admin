@@ -6,17 +6,26 @@ import service from "@/utils/request";
   *  {}
   * } data 
   */
- export function GetRole(data = {}){
+ export function GetUserRole(data = {}){
    return service.request({
        method: "post",
-       url: "/role/",
+       url: "/userRole/",
        data
    })
  }
 
-
 /**
- * 获取角色
+ * 系统列表
+ */
+export function GetSystem(data = {}){
+  return service.request({
+      method: "post",
+      url: "/system/",
+      data
+  })
+}
+/**
+ * 添加角色
  * @param {
   *  username：用户名（string）*
     truename：真实姓名（string）

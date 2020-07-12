@@ -43,7 +43,7 @@ import { reactive, ref, refs, watch, watchEffect, onBeforeMount } from "@vue/com
 import { AddInfo, GetList, EditInfo } from "@/api/news"
 import { formatDateTime } from "@/utils/validate"
 import CityPicker from "@/components/CityPicker"
-import { GetRole, UserAdd, UserEdit } from "@/api/user"
+import { GetRole, GetSystem, UserAdd, UserEdit } from "@/api/user"
 // 验证规则
 import {stripscript,validateEmail,validatePass,VerificationCode} from '@/utils/validate'
 export default {
@@ -145,7 +145,7 @@ export default {
     
     //  获取角色
     const getRole = () => {
-      GetRole().then(res => {
+      GetSystem().then(res => {
        data.roleItem = res.data.data
      })
     }  

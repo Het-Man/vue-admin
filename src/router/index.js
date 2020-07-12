@@ -8,29 +8,34 @@ const Console = () => import("@/views/Console");
 const infoIndex = () => import("@/views/info");
 const infoCategory = () => import("@/views/info/category");
 const userIndex = () => import("@/views/user");
-const InfoDetailed = () => import("@/views/info/InfoDetailed")
+const InfoDetailed = () => import("@/views/info/InfoDetailed");
 Vue.use(VueRouter);
-const originalPush = VueRouter.prototype.push
+
+const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err)
-}
-const routes = [
+  return originalPush.call(this, location).catch((err) => err);
+};
+const routes = [];
+/**
+ * 默认路由
+ */
+export const defaultRouterMap = [
   {
-    path:'/',
-    redirect:'login',
-    hidden:true,
-    meta:{
-      name:'首页'
-    }
+    path: "/",
+    redirect: "login",
+    hidden: true,
+    meta: {
+      name: "首页",
+    },
   },
   {
     path: "/login",
     name: "Login",
-    hidden:true,
+    hidden: true,
     component: Login,
-    meta:{
-      name:'登录'
-    }
+    meta: {
+      name: "登录",
+    },
   },
   /* 
     控制台
@@ -40,22 +45,27 @@ const routes = [
     name: "Home",
     component: Layout,
     redirect: "index",
-    
-    meta:{
-      name:'控制台',
-      icon:"console"
+
+    meta: {
+      name: "控制台",
+      icon: "console",
     },
-    children:[
+    children: [
       {
-        path: '/index',
-        name:'Index',
-        meta:{
-          name:'首页'
+        path: "/index",
+        name: "Index",
+        meta: {
+          name: "首页",
         },
-        component:Console
-      }
-    ]
+        component: Console,
+      },
+    ],
   },
+];
+/**
+ * 动态路由
+ */
+export const asnycRouterMap = [
   /* 
     信息管理
   */
@@ -63,64 +73,66 @@ const routes = [
     path: "/info",
     name: "Info",
     component: Layout,
-    meta:{
-      name:'信息管理',
-      icon:'info'
+    meta: {
+      system: "infoSystem",
+      name: "信息管理",
+      icon: "info",
     },
-    children:[
+    children: [
       {
-        path: '/infoIndex',
-        name:'infoIndex',
-        meta:{
-          name:'信息列表'
+        path: "/infoIndex",
+        name: "infoIndex",
+        meta: {
+          name: "信息列表",
         },
-        component:infoIndex
+        component: infoIndex,
       },
       {
-        path: '/infoCategory',
-        name:'infoCategory',
-        meta:{
-          name:'信息分类'
+        path: "/infoCategory",
+        name: "infoCategory",
+        meta: {
+          name: "信息分类",
         },
-        component:infoCategory
+        component: infoCategory,
       },
       {
-        path: '/InfoDetailed',
-        name: 'InfoDetailed',
+        path: "/InfoDetailed",
+        name: "InfoDetailed",
         hidden: true,
-        meta:{
-          name:'信息详情'
+        meta: {
+          name: "信息详情",
         },
-        component:InfoDetailed
-      }
-    ]
+        component: InfoDetailed,
+      },
+    ],
   },
   /* 
-    用户管理
-  */
- {
-  path: "/user",
-  name: "User",
-  component: Layout,
-  meta:{
-    name:'用户管理',
-    icon:'user'
-  },
-  children:[
-    {
-      path: '/userIndex',
-      name:'userIndex',
-      meta:{
-        name:'用户列表'
+  用户管理
+*/
+  {
+    path: "/user",
+    name: "User",
+    component: Layout,
+    meta: {
+      system: "userSystem",
+      name: "用户管理",
+      icon: "user",
+    },
+    children: [
+      {
+        path: "/userIndex",
+        name: "userIndex",
+        meta: {
+          name: "用户列表",
+        },
+        component: userIndex,
       },
-      component:userIndex
-    }
-  ]
-}
+    ],
+  },
 ];
 
 const router = new VueRouter({
-  routes
+  routes: defaultRouterMap,
 });
 
 export default router;

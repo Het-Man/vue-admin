@@ -4,11 +4,13 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 import app from './modules/app';
 import InfoDetailed from './modules/infoDetailed'
+import permission from './modules/permission'
 
 export default new Vuex.Store({
   
   modules: {
     app,
-    InfoDetailed
+    InfoDetailed,
+    permission
   }
 });
