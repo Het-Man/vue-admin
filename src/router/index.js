@@ -63,6 +63,21 @@ export const defaultRouterMap = [
   },
 ];
 /**
+ * 路由权限有两种一种后台返回路由 
+ * 另一种后台返回帐号的权限字符 前端配置
+ * 
+ * 1.系统配置
+ *  通过 system 接口返回系统的模块配置 
+ *  例：{name: "信息功能", role: "infoSystem"}
+        {name: "用户功能", role: "userSystem"}
+ * 2.角色配置
+ *  通过role 接口返回角色的名称配置模块
+ *  {name: "业务员", role: "sale"}
+    {name: "技术员", role: "technician"}
+    {name: "部门经理", role: "manager"}
+    在路由里meta字符中添加对应的属性 通过不用账户的返回的角色匹配不同的路由
+ */
+/**
  * 动态路由
  */
 export const asnycRouterMap = [
@@ -74,6 +89,7 @@ export const asnycRouterMap = [
     name: "Info",
     component: Layout,
     meta: {
+      role:['sale','manager'],
       system: "infoSystem",
       name: "信息管理",
       icon: "info",
@@ -83,6 +99,7 @@ export const asnycRouterMap = [
         path: "/infoIndex",
         name: "infoIndex",
         meta: {
+          role:['sale','technician','manager'],
           name: "信息列表",
         },
         component: infoIndex,
@@ -91,6 +108,7 @@ export const asnycRouterMap = [
         path: "/infoCategory",
         name: "infoCategory",
         meta: {
+          role:['technician','manager'],
           name: "信息分类",
         },
         component: infoCategory,
@@ -100,6 +118,7 @@ export const asnycRouterMap = [
         name: "InfoDetailed",
         hidden: true,
         meta: {
+          role:['technician','manager'],
           name: "信息详情",
         },
         component: InfoDetailed,
@@ -115,6 +134,7 @@ export const asnycRouterMap = [
     component: Layout,
     meta: {
       system: "userSystem",
+      role:['manager'],
       name: "用户管理",
       icon: "user",
     },
@@ -123,6 +143,7 @@ export const asnycRouterMap = [
         path: "/userIndex",
         name: "userIndex",
         meta: {
+          role:['manager'],
           name: "用户列表",
         },
         component: userIndex,

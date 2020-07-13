@@ -145,7 +145,7 @@ export default {
     
     //  获取角色
     const getRole = () => {
-      GetSystem().then(res => {
+      GetRole().then(res => {
        data.roleItem = res.data.data
      })
     }  

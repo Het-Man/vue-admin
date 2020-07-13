@@ -29,10 +29,7 @@ router.beforeEach((to,from,next) => {
       if(store.getters['permission/roles'].length === 0) {
         store.dispatch('permission/getRoles').then(response => {
             let role = response.role;
-            let button = response.button; // 这是上学时说的内容
-            let btnPerm = response.btnPerm;
             store.commit("permission/SET_ROLES", role);
-            // store.commit("app/SET_BUTTON", btnPerm);
             // 存储角色 
             store.dispatch('permission/createRouter', role).then(response => {
                 let addRouters = store.getters['permission/addRouters'];

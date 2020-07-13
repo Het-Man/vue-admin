@@ -1,7 +1,7 @@
 import service from "@/utils/request";
 
 /**
- * 获取角色
+ * 获取用户角色
  * @param {
   *  {}
   * } data 
@@ -10,6 +10,19 @@ import service from "@/utils/request";
    return service.request({
        method: "post",
        url: "/userRole/",
+       data
+   })
+ }
+/**
+ * 获取角色
+ * @param {
+  *  {}
+  * } data 
+  */
+ export function GetRole(data = {}){
+   return service.request({
+       method: "post",
+       url: "/role/",
        data
    })
  }
