@@ -68,6 +68,7 @@ export default {
   height: 100%;
   background-color: #344a5f;
   width: $navMenu;
+  z-index: 1;
   @include webkit(transition, all .3s ease 0s);
   svg {
     font-size: 20px;

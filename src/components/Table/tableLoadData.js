@@ -1,10 +1,12 @@
-import { reactive } from '@vue/composition-api';
+import { reactive} from '@vue/composition-api';
 import {requestUrl} from "@/api/requestUrl"
 import { loadTableData } from  "@/api/common"
+import store from '@/store/index'
 export function loadData () {
   const tableData = reactive({
     item:[],
-    total:0
+    total:0,
+    category:[]
   })
 
   const tableLoadData = (params) => {
@@ -26,9 +28,16 @@ export function loadData () {
       })
 
   }
+  
+  const getCategory = () => {
+    store.dispatch('app/getInfoCategory').then( res => {
+      tableData.category = res
+    })
+  }
   return {
     tableData,
-    tableLoadData
+    tableLoadData,
+    getCategory
   }
 }
 

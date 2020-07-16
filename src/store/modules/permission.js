@@ -2,14 +2,16 @@
 import { GetUserRole} from '@/api/user'
 import { defaultRouterMap, asnycRouterMap } from '@/router'
 const state  = {
-  roles: [],
+  roles: [], //角色的值
+  btnPermission:[], //按钮的值
   allRouters: defaultRouterMap, //所有路由
   addRouters: [] //匹配的
 }
 const getters = {
   roles: state => state.roles,
   allRouters: state => state.allRouters,
-  addRouters: state => state.addRouters
+  addRouters: state => state.addRouters,
+  btnPermission: state => state.btnPermission
 }
 const mutations = {
   SET_ROLES(state, value){
@@ -18,6 +20,9 @@ const mutations = {
   SET_ROUTER(state, router){
     state.addRouters = router
     state.allRouters = defaultRouterMap.concat(router)
+  },
+  SET_BTN(state,value) {
+    state.btnPermission = value
   }
 }
 
@@ -102,7 +107,6 @@ function filterAsyncRouter(asnycRouterMap,role){
         item.children = filterAsyncRouter(item.children,role)
         
       }
-      console.log(item)
       return item
     }
   })

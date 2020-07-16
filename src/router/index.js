@@ -108,7 +108,7 @@ export const asnycRouterMap = [
         path: "/infoCategory",
         name: "infoCategory",
         meta: {
-          role:['technician','manager'],
+          role:['sale','technician','manager'],
           name: "信息分类",
         },
         component: infoCategory,

@@ -29,7 +29,7 @@ export default {
     }
   },
   setup( props, { root, emit}){
-    console.log(props.config)
+    // console.log(props.config)
     const data = reactive({
       uploadKey: {
         key:"",
@@ -37,13 +37,11 @@ export default {
       },
       image: ""
     })
-  console.log(props.imgUrl)
     watch( () => props.imgUrl, (val) => {
       data.image = val
-      console.log(data.image)
+      // console.log(data.image)
     })
 
-    console.log()
     //函数方法 ======================
     // 上传成功
     const handleAvatarSuccess = (res, file) => {

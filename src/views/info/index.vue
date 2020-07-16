@@ -34,20 +34,11 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="3">
+      <el-col :span="4">
         <div class='label-wrap key-work'>
           <label for >关键字：</label>
           <div class='warp-content'>
-            <!-- <el-select v-model="searchKey" style='width:100%' >
-              <el-option
-                v-for="item in data.searchOption.item" 
-                :value="item.value"
-                :label="item.label"
-                :key="item.value"
-              >
-              </el-option>
-            </el-select> -->
-            <SelectVue :config="data.configOption" />
+            <SelectVue :config="data.configOption" :selectData.sync='data.searchKey' />
           </div>
         </div>
       </el-col>
@@ -57,7 +48,7 @@
       <el-col :span='2'>
         <el-button type='danger' style='width:100%' @click="search" >搜索</el-button>
       </el-col>
-      <el-col :span='2' :push='3'>
+      <el-col :span='2' :push='2'>
         <el-button type='danger' @click="newAndEdit({title:'新增'})" class="pull-right" style='width:100%' >
           新增
         </el-button>
@@ -65,43 +56,27 @@
     </el-row>
     <div class='black-space-30'></div>
     <!-- 表格 -->
-    <el-table
-      v-loading="loading"
-      :data="data.tableData.item"
-      border
-      @selection-change="handleSelectionChange"
-      style="width: 100%">
-      <el-table-column type='selection' width='45'></el-table-column>
-      <el-table-column prop="title" label="标题" align="center" width='750'></el-table-column>
-      <el-table-column prop="categoryId" label="类别" :formatter="toCategory" align="center" width='130'></el-table-column>
-      <el-table-column prop="createDate" label="日期" :formatter="toDate" align="center"  width='237'></el-table-column>
-      <el-table-column prop="categoryName" label="管理人" align="center" width='115'></el-table-column>
-      <el-table-column  label="操作" align="center" >
-        <template slot-scope="scope" >     
-          <el-button type='danger' @click="delItem(scope.row.id)" size="small" >删除</el-button>
-          <el-button type="success" @click="newAndEdit({title:'编辑',id:scope.row.id})" size="small"  >编辑</el-button>
-          <el-button type="success" @click="detailed(scope.row)" size="small"  >编辑详情</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    
+    <TableVue 
+      ref="userTable" 
+      :configTable="data.configTable" 
+      :tableRow.sync="data.tableRow"  
+      :tableCategory.sync="data.options.category"
+    >
+      <!-- 作用域插槽 v-slot:status(插槽名)slotData(子传父的命名) -->
+      
+      <template v-slot:operation="slotData" >
+       <el-button type='danger' @click="delItem(slotData.data)" size="small" v-btnPerm='"info:del"' class="btn-hiden" >删除</el-button>
+        <el-button type="success" @click="newAndEdit({title:'编辑',id:slotData.data.id})" size="small" v-btnPerm='"info:edit"' class="btn-hiden" >编辑</el-button>
+        <el-button type="success" @click="detailed(slotData.data)" size="small" v-btnPerm='"info:detailed"' class="btn-hiden" >编辑详情</el-button>
+      </template>
+      <template v-slot:tableFooterLeft >
+        <el-button size="small" @click="btnDelAll" >批量删除</el-button>
+      </template>
+    </TableVue>
     <div class='black-space-30'></div>
-    <!-- 底部 -->
-    <el-row>
-      <el-col :span='13'>
-        <el-button size='medium' @click="delAll" >批量删除</el-button>
-      </el-col>
-      <el-col :span='11'>
-        <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
-        </el-pagination>
-      </el-col>
-    </el-row>
     <!-- 新增弹出框 -->
-    <DialogInfo :flag.sync='dialogInfo' :typeTitle='data.types' :category='data.options.category' @getListEmit='getList' />
+    <DialogInfo :flag.sync='dialogInfo' :typeTitle='data.types' :category='data.options.category' @getListEmit='refsTableData' />
   </div>
 </template>
 <script>
@@ -110,20 +85,20 @@
   import {GetList,removeInfo} from '@/api/news'
   // 全局定义是否确认删除弹出框
   import { global } from "../../utils/global_v3.0"
-  // 转换时间
-  import { timestampToTime } from '@/utils/validate'
   // 下拉框组件
   import SelectVue from "@/components/Select"
   // 弹出框组件
   import DialogInfo from './dialog/info'
+  // table组件
+  import TableVue from "@/components/Table"
 export default {
   name:'infoIndex',
-  components: { DialogInfo, SelectVue },
-  setup(props, {root}){
+  components: { DialogInfo, SelectVue, TableVue },
+  setup(props, {root, refs}){
     const { str, confirm } = global()
     // const { categoryItem, getInfoCategory } = common()
     // ==============值类型数据============
-    const searchKey = ref('id')
+    // const searchKey = ref('')
     const searchKeyWord = ref('')
     const categoryVal = ref('')
     const dataVal = ref('')
@@ -133,34 +108,70 @@ export default {
     const dialogInfo = ref(false)
     // loading
     const loading = ref(false)
-    //删除id
-    const deleteId = ref('')
-    // 单条信息id 传给编辑弹窗
-    // const 
 
     // ===========================对象数据======================
     const data = reactive({
+      // 
+      searchKey:{},
+      // 下拉框组件配置
       configOption: {
         init:['id','title']
       },
+      // 分类
       options:{
         category:[]
-      },
-      searchOption: {
-        item: [
-          {value:'id',label:"ID"},
-          {value:'title',label:"标题"}
-        ]
       },
       tableData : {
         item:[]
       },
-      page: {
-        pageNumber : 1,
-        pageSize : 10
-      },
+      // table选择的数据
+      tableRow:{},
       // 弹出框类型
-      types: {}
+      types: {},
+      // table组件配置参数
+      configTable:{
+        selection:true,
+        recordCheckbox: true,
+        // 表头
+        tHead:[
+          {
+           label: "标题" ,
+           field: "title",
+           width: 700
+          },
+          {
+           label: "类别",
+           field: "categoryId",
+           width: 130
+          },
+          {
+           label: "日期",
+           field: "createDate",
+           width: 237
+          },
+          {
+           label: "管理人",
+           field: "categoryName",
+           width: 115
+          },
+          
+          {
+           label: "操作",
+           field: "slot",
+           columnType: "slot",
+            slotName: "operation"
+          },
+        ],
+        // 请求接口的URL
+        requestData: {
+          url: "getNewsList",
+          method: "post",
+          data:{
+            pageNumber: 1,
+            pageSize: 10,
+          }
+        }
+      }
     }) 
     // ================函数 ===============================
     const handleSizeChange = (val) =>{
@@ -171,27 +182,16 @@ export default {
       dialogInfo.value = true
       data.types ={...params}
     }
-    // 格式化类型
-    const toCategory = (row, column, cellValue) => {
-      let id = cellValue
-      let categoryData = data.options.category.filter(item => item.id == id)[0];
-      return categoryData.category_name
-
-    }
-    // 格式化日期
-    const  toDate = (row, column, cellValue, index) => {
-      return timestampToTime(cellValue)
-    }
-    // 点击页码
-    const handleCurrentChange = (val) =>{
-      data.page.pageNumber = val
-      getList()
-
+   
+    
+    //更新table数据  获取到子组件 调用更新数据方法
+    const refsTableData = () => {
+      refs.userTable.refreshData()
     }
     // 单个删除
-    const delItem = (id) => { 
+    const delItem = (data) => { 
       //需要删除的id存起来
-      deleteId.value = [id]
+      deleteId.value = [data.id]
       confirm({
           content:'确定要删除吗？删除后无法恢复！',
           tip:'警告',
@@ -199,10 +199,11 @@ export default {
       })
     }
     // 批量删除
-    const delAll = () => {
-      console.log(deleteId.value)
-      console.log(deleteId.value.length)
-      if(!deleteId.value || deleteId.value.length == 0){
+    const btnDelAll = () => {
+      console.log(data.tableRow)
+      let deleteId = data.tableRow.idItem
+      console.log(deleteId.length)
+      if(!deleteId || deleteId.length == 0){
         root.$message({
           message:'请选择需要删除的数据',
           type:'error'
@@ -217,45 +218,28 @@ export default {
     }
     const confirmDelete  = () => {
       console.log(1)
-      removeInfo({id:deleteId.value}).then(res => {
+      removeInfo({id:data.tableRow.idItem}).then(res => {
         console.log(res)
-        getList()
+        refsTableData()
+        root.$message({
+          message: res.data.message,
+          type:'success'
+        })
       }).catch(err=>{})
-    }
-    // 获取信息列表
-    const getList = () =>{
-      let requestData = formatData()
-      loading.value = true
-      GetList(requestData).then(res => {
-        let resData = res.data.data.data
-        data.tableData.item = resData
-        // 总条数
-        total.value = res.data.data.total
-        loading.value = false
-      }).catch(err => {
-        loading.value = false
-      })
-    }
-    // 获取分类
-    const getCategory = () => {
-      root.$store.dispatch('app/getInfoCategory').then( res => {
-        data.options.category = res
-      })
     }
     // 搜索
     const search = () => {
-      // console.log(categoryVal.value)
-      // console.log(dataVal.value)
-      console.log(searchKey.value)
-      let data = formatData()
-      getList()
-      console.log(data)
+      console.log(data.searchKey.value)
+      let searchData = formatData()
+      // 用ref refs 带参数的调用table组件刷新数据的方法
+      refs.userTable.paramsLoadData(searchData)
+      console.log(searchData)
     }
-    // 处理数据
+    // 处理搜索条件数据
     const formatData = () => {
       let requestData  = {
-        pageNumber: data.page.pageNumber,
-        pageSize: data.page.pageSize
+        pageNumber: 1,
+        pageSize: 10
       }
       // 分类
       if(categoryVal.value) { requestData.categoryId = categoryVal.value}
@@ -268,19 +252,14 @@ export default {
 
       }
       // 关键字
-      if(searchKeyWord.value){
-        requestData[searchKey.value] = searchKeyWord.value
+      // let searchKey = 
+      if(searchKeyWord.value && data.searchKey.value){
+        console.log(data.searchKey.value)
+        requestData[data.searchKey.value] = searchKeyWord.value
       }
       return requestData
     }
-    //选中
-    const handleSelectionChange = (val) => {
-      // console.log(val)
-      let id = val.map(item => item.id)
-      // console.log(id)
-      deleteId.value = id
-      // console.log(deleteId.value)
-    } 
+    
     // 编辑详情
     const detailed = (params) => {
       root.$store.commit('InfoDetailed/UPDATE_STATE_VALUE',{
@@ -307,17 +286,15 @@ export default {
       vue 2.0 mounted
     */
     onMounted(() => {
-      getCategory()
-      getList()
     })
 
     return {
       // ref
-      categoryVal, searchKey, dataVal, dialogInfo, total, loading,searchKeyWord,
+      categoryVal, dataVal, dialogInfo, total, loading,searchKeyWord,
       // reactive
       data,
       // 函数
-      handleSizeChange, handleCurrentChange,delItem,delAll,toDate,toCategory, handleSelectionChange,search,newAndEdit,getList,detailed
+      handleSizeChange,delItem,btnDelAll,search,newAndEdit,detailed,refsTableData
     }
   }
 }

@@ -26,6 +26,19 @@ import service from "@/utils/request";
        data
    })
  }
+/**
+ * 获取角色
+ * @param {
+  *  {}
+  * } data 
+  */
+ export function GetPernButton(data = {}){
+   return service.request({
+       method: "post",
+       url: "	/permButton/",
+       data
+   })
+ }
 
 /**
  * 系统列表

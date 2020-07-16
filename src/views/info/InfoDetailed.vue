@@ -115,7 +115,6 @@ export default {
       }
       console.log(resData)
       console.log(form)
-      return false
       // 移除多余的用户名
       delete resData.categoryName
       // 按钮等待状态

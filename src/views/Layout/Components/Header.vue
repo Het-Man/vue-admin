@@ -53,6 +53,7 @@ export default {
     height: 75px;
     line-height: 75px;
     // width: calc( 100% - 250px );
+    z-index: 1;
     right: 0;
     background-color: #fff;
     @include webkit(box-shadow, 0 3px 16px 0 rgba(0,0,0,.1));

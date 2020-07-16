@@ -59,16 +59,16 @@ const actions = {
         resolve()
       })
     },
-    //获取分类
-    getInfoCategory(content, repuestData) {
-      return new Promise((resolve, reject) => {
-          GetCategory({}).then((response) => {
-              resolve(response.data.data.data)
-          }).catch(error => {
-              reject(error)
-          })
-      })
-  }
+  //获取分类
+  getInfoCategory(content, repuestData) {
+    return new Promise((resolve, reject) => {
+        GetCategory({}).then((response) => {
+            resolve(response.data.data.data)
+        }).catch(error => {
+            reject(error)
+        })
+    })
+  },
 }
 
 

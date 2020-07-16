@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="新增" :visible.sync="dialogVisible" width="580px" @close="close" @open="openDialog">
+    <el-dialog :title="data.title == '编辑'? '编辑' :'新增' " :visible.sync="dialogVisible" width="580px" @close="close" @open="openDialog">
       <el-form :model="data" ref="addInfoForm">
         <el-form-item label="类别" :label-width="data.formLabelWidth">
           <el-select v-model="data.form.category" placeholder="请选择活动区域">
@@ -60,7 +60,8 @@ export default {
       },
       // 分类下拉
       categoryOption: [],
-      submitLoading :false
+      submitLoading :false,
+      title:''
     });
    
     // 监听传参如果父组件传值就赋值给弹出框的状态
@@ -78,7 +79,8 @@ export default {
     // 打开对话框
     const openDialog = () => {
       data.categoryOption = props.category
-      if(props.typeTitle.title == '编辑'){
+      data.title = props.typeTitle.title
+      if(data.title == '编辑'){
         let requestData = {
           id: props.typeTitle.id,
           pageNumber: 1,
@@ -158,22 +160,6 @@ export default {
           data.submitLoading = false
         }).catch(err => {})
 
-    }
-    // 编辑信息
-    const editInfo = () => {
-      let dateTime = formatDateTime(new Date())
-      let request = {
-        id: props.typeTitle.id,
-        categoryId: data.form.category ,
-        title: data.form.title,
-        imgUrl: "",
-        createDate: dateTime,
-        content: data.form.content,
-      }
-      EditInfo(request).then(res => {
-        console.log(res)
-        // dialogVisible.value = false
-      })
     }
     return {
       dialogVisible,

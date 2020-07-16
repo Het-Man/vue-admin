@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted, computed } from "@vue/composition-api";
+import { reactive, ref, onMounted, computed, onBeforeMount } from "@vue/composition-api";
 export default {
   name:'selectComponent',
   props:{
@@ -59,7 +59,7 @@ export default {
         // 初始化options
         data.initOption = optionArr
 
-        data.selectValue = data.initOption[0].value
+        // data.selectValue = data.initOption[0].value
       
     }
     const handleSelect = val => {
@@ -67,6 +67,9 @@ export default {
       let fiterData = data.options.filter(item => item.value == val)[0]
       emit("update:selectData",fiterData)
     } 
+    onBeforeMount(() => {
+      
+      })
     onMounted(()=> {
       initOption()
     })

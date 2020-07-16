@@ -27,6 +27,16 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="按钮：" :label-width="data.formLabelWidth" >
+          <template v-if="data.btnItem.length >0">
+            <div v-for="item in data.btnItem" :key="item.name">
+              <h4>{{item.name}}</h4>
+              <template v-if="item.perm && item.perm.length > 0">
+                <el-checkbox-group v-model="form.btnPerm" >
+                  <el-checkbox v-for="itemPerm in item.perm" :key="itemPerm.name" :label="itemPerm.value" >{{itemPerm.name}}</el-checkbox>
+                </el-checkbox-group>
+              </template>
+            </div>
+          </template>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -40,10 +50,10 @@
 <script>
 import sha1 from 'js-sha1';
 import { reactive, ref, refs, watch, watchEffect, onBeforeMount } from "@vue/composition-api";
-import { AddInfo, GetList, EditInfo } from "@/api/news"
+import { AddInfo, GetList, EditInfo,  } from "@/api/news"
 import { formatDateTime } from "@/utils/validate"
 import CityPicker from "@/components/CityPicker"
-import { GetRole, GetSystem, UserAdd, UserEdit } from "@/api/user"
+import { GetRole, GetSystem, UserAdd, UserEdit, GetPernButton } from "@/api/user"
 // 验证规则
 import {stripscript,validateEmail,validatePass,VerificationCode} from '@/utils/validate'
 export default {
@@ -120,12 +130,14 @@ export default {
         status: "1",
         // 角色列表
         role:[],
+        btnPerm:[]
     })
     const data = reactive({
       formLabelWidth: '90px',
       // 省市区街道
       cityPickerData:{},
       roleItem:[],
+      btnItem:[],
       // 校验
       rules: reactive({
         username: [
@@ -145,17 +157,28 @@ export default {
     
     //  获取角色
     const getRole = () => {
-      GetRole().then(res => {
-       data.roleItem = res.data.data
-     })
+      if(data.roleItem.length === 0){
+        GetRole().then(res => {
+          data.roleItem = res.data.data
+        })
+      }
+      // 获取按钮
+      if(data.btnItem.length === 0){
+        GetPernButton().then(res => {
+          console.log(res)
+          data.btnItem = res.data.data
+          console.log(data.btnItem)
+        })
+      }
     }  
     // 打开对话框
     const openDialog = () => {
-      console.log(props.editData)
       let editData = props.editData
+      console.log(props.editData)
       // 如果存在id就是编辑
       if(editData.id){
         editData.role = editData.role.split(',')
+        editData.btnPerm = editData.btnPerm ? editData.btnPerm.split(',') : []; // 数组
         Object.assign(form ,editData)
 
       }else{ //添加
@@ -194,6 +217,8 @@ export default {
           const requestData = JSON.parse(JSON.stringify(form))
           // 角色的值转换成字符串
           requestData.role = requestData.role.join()
+          // 按钮的值转换成字符串
+          requestData.btnPerm = requestData.btnPerm.join()
           // 地区的值
           requestData.region = JSON.stringify(data.cityPickerData)
           

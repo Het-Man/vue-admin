@@ -28,8 +28,11 @@ router.beforeEach((to,from,next) => {
       // 存储在store中的角色的长度为0 就请求角色列表
       if(store.getters['permission/roles'].length === 0) {
         store.dispatch('permission/getRoles').then(response => {
+          console.log(response)
             let role = response.role;
+            let btn = response.btnPerm
             store.commit("permission/SET_ROLES", role);
+            store.commit("permission/SET_BTN", btn);
             // 存储角色 
             store.dispatch('permission/createRouter', role).then(response => {
                 let addRouters = store.getters['permission/addRouters'];

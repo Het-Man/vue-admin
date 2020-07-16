@@ -5,7 +5,7 @@
       <el-table-column v-if="data.tableConfig.selection" type="selection" width="55"></el-table-column>
       <template v-for="item in data.tableConfig.tHead">
           <!-- 插槽里自定义内容 -->
-          <el-table-column  :key="item.field" :prop="item.field" :label="item.label" v-if="item.columnType" >
+          <el-table-column  :key="item.field" :prop="item.field" align="center" :label="item.label" v-if="item.columnType" >
             <template slot-scope="scope">
               <!-- ：data表示定义的属性名 scope.row表示传的值 -->
               <slot :name="item.slotName" :data="scope.row">
@@ -14,7 +14,9 @@
             </template>
           </el-table-column>
           <!-- 文本渲染 -->
-          <el-table-column  :key="item.field" :prop="item.field" :label="item.label" v-else></el-table-column>
+          <el-table-column  :key="item.field" :prop="item.field" align="center" :label="item.label" :width="item.width" :formatter='toCategory' v-else-if="item.label =='类别'"></el-table-column>
+          <el-table-column  :key="item.field" :prop="item.field" align="center" :label="item.label" :width="item.width" :formatter='toDate' v-else-if="item.label =='日期'"></el-table-column>
+          <el-table-column  :key="item.field" :prop="item.field" align="center"  :label="item.label" :width="item.width" v-else></el-table-column>
 
       </template>
     </el-table>
@@ -49,6 +51,8 @@ import { requestUrl } from "@/api/requestUrl"
 import { loadTableData } from  "@/api/common"
 import { loadData } from "./tableLoadData"
 import { paginationHook } from "./paginationHook"
+// 转换时间
+  import { timestampToTime } from '@/utils/validate'
 export default {
   name:"Table",
   props:{
@@ -63,7 +67,7 @@ export default {
   },
   setup(props, { root, emit }){
     // 表格数据逻辑业务
-    const { tableLoadData, tableData } = loadData()
+    const { tableLoadData, tableData,getCategory } = loadData()
     // 页码逻辑
     const { pageData, handleSizeChange, handleCurrentChange,totalCount } = paginationHook()
 
@@ -81,11 +85,14 @@ export default {
     // 监听 封装的table返回值 如果有值就赋给tableData
     watch([
       () => tableData.item,
-      () => tableData.total
-    ], ([tableData,total]) => {
+      () => tableData.total,
+      () => tableData.category
+    ], ([tableData,total,category]) => {
       data.tableData = tableData
       // console.log(total)
       totalCount(total)
+      // 把分类返回给父组件
+      emit('update:tableCategory',category)
     })
 
     // 监听页码
@@ -155,10 +162,21 @@ export default {
       data.tableConfig.requestData.data = loadData
       tableLoadData(data.tableConfig.requestData)
     }
+     // 格式化类型
+    const toCategory = (row, column, cellValue) => {
+      let id = cellValue
+      let categoryData = tableData.category.filter(item => item.id == id)[0];
+      return categoryData.category_name
 
+    }
+    // 格式化日期
+    const  toDate = (row, column, cellValue, index) => {
+      return timestampToTime(cellValue)
+    }
     onBeforeMount(()=> {
       initTableConfig()
       tableLoadData(data.tableConfig.requestData)
+      getCategory()
 
     })
 
@@ -166,10 +184,88 @@ export default {
       //reactive
       data,pageData,
       //function 
-      handleSizeChange,handleCurrentChange,thatSelectCheckbox,refreshData,paramsLoadData
+      handleSizeChange,handleCurrentChange,thatSelectCheckbox,refreshData,paramsLoadData,toCategory,toDate
     }
   }
 };
+/** 
+ * table足迹使用说明
+ * 组件位置：src>components > Table > index
+ * 引用方式：import TableVue from "@c/Table";
+ * template:
+ * <TableVue 
+      ref="userTable" 
+      :configTable="data.configTable" 
+      :tableRow.sync="data.tableRow"  
+      :tableCategory.sync="data.options.category"
+    >
+      <!-- 作用域插槽 v-slot:status(插槽名)slotData(子传父的命名) -->
+      
+      <template v-slot:operation="slotData" >
+       <el-button type='danger' @click="delItem(slotData.data)" size="small" v-btnPerm='"info:del"' class="btn-hiden" >删除</el-button>
+        <el-button type="success" @click="newAndEdit({title:'编辑',id:slotData.data.id})" size="small" v-btnPerm='"info:edit"' class="btn-hiden" >编辑</el-button>
+        <el-button type="success" @click="detailed(slotData.data)" size="small" v-btnPerm='"info:detailed"' class="btn-hiden" >编辑详情</el-button>
+      </template>
+      <template v-slot:tableFooterLeft >
+        <el-button size="small" @click="btnDelAll" >批量删除</el-button>
+      </template>
+  </TableVue>
+
+  配置参数
+    configTable:{
+        selection:true,
+        recordCheckbox: true,
+        // 表头
+        tHead:[
+          {
+           label: "标题" ,
+           field: "title",
+           width: 700
+          },
+          {
+           label: "类别",
+           field: "categoryId",
+           width: 130
+          },
+          {
+           label: "日期",
+           field: "createDate",
+           width: 237
+          },
+          {
+           label: "管理人",
+           field: "categoryName",
+           width: 115
+          },
+          
+          {
+           label: "操作",
+           field: "slot",
+           columnType: "slot",
+            slotName: "operation"
+          },
+        ],
+        // 请求接口的URL
+        requestData: {
+          url: "getNewsList",
+          method: "post",
+          data:{
+            pageNumber: 1,
+            pageSize: 10,
+          }
+        }
+      }
+  参数说明
+    selection:（多选框是否显示）
+      数据类型：Bollen
+      可配置参数：true false
+    tHead:(设置表头)
+      数据类型：Array
+      可配置参数：label field columnType（判断是否是插槽） slotName（插槽名）
+    requestData:(请求接口的URL)
+      数据类型：Object
+      可配置参数: url（地址/具体地址配置在api/requestUrl文件下）method(请求方式) data:｛page:Number,PageSize:Number｝(页码)
+*/
 </script>
 
 <style lang="scss" scoped>
