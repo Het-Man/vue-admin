@@ -2,7 +2,14 @@
   <div id='main-wrap' >
     <div class="main-content">
       <div class="content">
-        <router-view></router-view>
+        <!-- include  名称匹配的组件会缓存  exclude不会缓存 -->
+        <keep-alive>
+          
+          <!-- <router-view  exclude='infoCategory'></router-view> -->
+          <router-view v-if="$route.meta.keepAlive"></router-view>
+
+        </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
 
       </div>
     </div>

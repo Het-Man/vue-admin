@@ -1,5 +1,5 @@
 
-import { Login} from '@/api/login'
+import { Login, Logout} from '@/api/login'
 import { setToKen,removeToKen,removeUserName, setUserName, getUserName } from '../../utils/tokenMethods'
 import { GetCategory } from '@/api/news'
 const state  = {
@@ -52,11 +52,12 @@ const actions = {
     // 点击退出按钮
     exit({ commit }){
       return new Promise((resolve,reject)=>{
-        removeToKen()
-        removeUserName()
-        commit("SET_TOKEN","")
-        commit("SET_USERNAME","")
-        resolve()
+          
+          removeToKen()
+          removeUserName()
+          commit("SET_TOKEN","")
+          commit("SET_USERNAME","")
+          resolve()
       })
     },
   //获取分类

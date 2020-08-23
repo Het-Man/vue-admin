@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted, computed } from "@vue/composition-api";
+import { reactive, ref, onMounted, computed, onActivated, onDeactivated } from "@vue/composition-api";
 import { GetList, EditInfo } from '@/api/news'
 import { timestampToTime } from '@/utils/validate'
 import UploadImg from "@/components/UploadImg"
@@ -138,7 +138,15 @@ export default {
     */
     onMounted(()=> {
       getCategory()
+    })
+    // 进入页面
+    onActivated(() => {
+      data.id = root.$route.params.id || root.$store.getters['InfoDetailed/infoId']
       getInfo()
+
+    })
+    // 离开页面
+    onDeactivated(() => {
     })
     return{
       // reactive

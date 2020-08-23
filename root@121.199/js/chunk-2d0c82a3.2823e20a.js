@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0c82a3"],{"545c":function(n,e,c){"use strict";c.r(e);var t=function(){var n=this,e=n.$createElement,c=n._self._c||e;return c("div",[n._v(" 控制台页面 ")])},u=[],a={name:"Index"},l=a,r=c("2877"),s=Object(r["a"])(l,t,u,!1,null,null,null);e["default"]=s.exports}}]);

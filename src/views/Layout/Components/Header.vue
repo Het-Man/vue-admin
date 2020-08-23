@@ -31,9 +31,14 @@ export default {
     // 退出登录按钮
     const exit  = () => {
       root.$store.dispatch("app/exit").then(res=>{
-        root.$router.push({
-          name:'/login'
-        })
+          root.$message({
+            message: "退出成功！",
+            type:'success'
+          })
+
+          root.$router.push({
+            name:'/login'
+          })
       })
     }
     return {

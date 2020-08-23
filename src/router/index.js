@@ -61,6 +61,25 @@ export const defaultRouterMap = [
       },
     ],
   },
+  {
+    path:"/page404",
+    hidden:true,
+    meta:{
+      name:"404",
+      icon:'404'
+    },
+    component:Layout,
+    children: [
+      {
+        path: "/404",
+        meta: {
+          name: "404"
+        },
+        component: () => import("../views/404.vue")
+      }
+    ]
+  },
+  
 ];
 /**
  * 路由权限有两种一种后台返回路由 
@@ -99,6 +118,7 @@ export const asnycRouterMap = [
         path: "/infoIndex",
         name: "infoIndex",
         meta: {
+          keepAlive:true,
           role:['sale','technician','manager'],
           name: "信息列表",
         },
@@ -108,6 +128,7 @@ export const asnycRouterMap = [
         path: "/infoCategory",
         name: "infoCategory",
         meta: {
+          keepAlive:true,
           role:['sale','technician','manager'],
           name: "信息分类",
         },
@@ -118,6 +139,7 @@ export const asnycRouterMap = [
         name: "InfoDetailed",
         hidden: true,
         meta: {
+          keepAlive:true,
           role:['technician','manager'],
           name: "信息详情",
         },
@@ -149,6 +171,9 @@ export const asnycRouterMap = [
         component: userIndex,
       },
     ],
+  },
+  {
+    path: "*", redirect: "404", hidden: true,
   },
 ];
 

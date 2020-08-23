@@ -174,13 +174,11 @@ export default {
       }
     }) 
     // ================函数 ===============================
-    const handleSizeChange = (val) =>{
-      console.log(val)
-    }
     // 新增或者编辑弹窗
     const newAndEdit = (params) => {
       dialogInfo.value = true
       data.types ={...params}
+      console.log(data.types)
     }
    
     
@@ -229,7 +227,7 @@ export default {
     }
     // 搜索
     const search = () => {
-      console.log(data.searchKey.value)
+      // console.log(data.searchKey.value)
       let searchData = formatData()
       // 用ref refs 带参数的调用table组件刷新数据的方法
       refs.userTable.paramsLoadData(searchData)
@@ -237,10 +235,7 @@ export default {
     }
     // 处理搜索条件数据
     const formatData = () => {
-      let requestData  = {
-        pageNumber: 1,
-        pageSize: 10
-      }
+      let requestData  = {}
       // 分类
       if(categoryVal.value) { requestData.categoryId = categoryVal.value}
       // 日期
@@ -253,7 +248,7 @@ export default {
       }
       // 关键字
       // let searchKey = 
-      if(searchKeyWord.value && data.searchKey.value){
+      if(searchKeyWord.value ){
         console.log(data.searchKey.value)
         requestData[data.searchKey.value] = searchKeyWord.value
       }
@@ -294,7 +289,7 @@ export default {
       // reactive
       data,
       // 函数
-      handleSizeChange,delItem,btnDelAll,search,newAndEdit,detailed,refsTableData
+      delItem,btnDelAll,search,newAndEdit,detailed,refsTableData
     }
   }
 }

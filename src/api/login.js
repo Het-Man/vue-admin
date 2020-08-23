@@ -34,3 +34,15 @@ export function Login(data){
     data
   })
 }
+/* 
+  退出登录
+*/
+
+export function Logout(data ={}){
+  // console.log(data)
+  return service.request({
+    method:'post',
+    url:"/logout/",
+    data
+  })
+}

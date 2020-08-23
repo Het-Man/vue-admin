@@ -63,7 +63,7 @@ export default {
     const data = reactive({
       // 下拉框菜单配置
       configOption: {
-        init:['name','phone']
+        init:['truename','phone']
       },
       // 下拉菜单数据
       selectData:{},

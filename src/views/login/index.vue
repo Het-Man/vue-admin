@@ -222,6 +222,11 @@ export default {
         btnLoginStatus.value = false
         countDown(60)
       }).catch(err=>{
+        btnLoginStatus.value = false
+        updataBtnStatus({
+          status:false,
+          text:'再次获取'
+        })
         console.log(err)
       })
 

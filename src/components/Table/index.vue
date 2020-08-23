@@ -166,6 +166,7 @@ export default {
     const toCategory = (row, column, cellValue) => {
       let id = cellValue
       let categoryData = tableData.category.filter(item => item.id == id)[0];
+      if(!categoryData) {return false}
       return categoryData.category_name
 
     }

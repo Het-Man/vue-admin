@@ -39,7 +39,7 @@ const actions = {
   // 创建添加动态路由
   createRouter({ commit }, requestData) {
     return new Promise((resolve, reject) => {
-      console.log(requestData)
+      // console.log(requestData)
       let role = requestData
       //超管状态
       let addRouters = []
@@ -59,7 +59,7 @@ const actions = {
         //   //   return item            
         //   // }
 
-        //   // 通过角色配置
+        //  // 通过角色配置
         /**
          * 路由里有children
          * 两种方式 一种直接if嵌套if
@@ -110,6 +110,8 @@ function filterAsyncRouter(asnycRouterMap,role){
       return item
     }
   })
+  // 把404路由加进去
+  addRouters.push(asnycRouterMap[asnycRouterMap.length-1])
   return addRouters
 }
 

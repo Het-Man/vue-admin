@@ -24,7 +24,7 @@ export default {
     const data = reactive({
       initOption:[],
       options:[
-        {value:'name',label:'姓名'},
+        {value:'truename',label:'姓名'},
         {value:'phone',label:'手机号'},
         {value:'email',label:'邮箱'},
         {value:"id",label:'ID'},
@@ -59,7 +59,9 @@ export default {
         // 初始化options
         data.initOption = optionArr
 
-        // data.selectValue = data.initOption[0].value
+        data.selectValue = data.initOption[0].value
+        console.log(data.initOption[0])
+        emit("update:selectData",data.initOption[0])
       
     }
     const handleSelect = val => {

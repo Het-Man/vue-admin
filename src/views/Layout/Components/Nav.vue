@@ -4,7 +4,8 @@
       <img src="../../../assets/navLogo.png" alt="">
     </h1>
         <el-menu
-          default-active="1-4-1"
+          
+          :default-active="defaultRouter"
           class="el-menu-vertical-demo"
           :collapse="isCollapse"
           background-color = "transparent"
@@ -36,6 +37,11 @@ export default {
     
     // 路由列表
     const routers = reactive(root.$router.options.routes)
+    // 默认选中路由列表
+    const defaultRouter = computed(()=>{
+      const {path} = root.$route
+      return path
+    })
     // 监听导航栏缩放
     const isCollapse = computed (()=>{
       return root.$store.state.app.isCollapse
@@ -48,7 +54,8 @@ export default {
 
     return {
       isCollapse,
-      routers
+      routers,
+      defaultRouter
     }
   }
 };
